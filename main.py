@@ -51,12 +51,9 @@ def read_txt(_path_to_txt:str):
         
         #Вычищаем возможную помойку
         try:
-            string = string.replace('\n', '')
+            string = string.replace('\ufeff', '')   #1С бывает засовывает свою какую то параметризацию выглядик как вот эта какаха которую я отрезаю
         finally:
-            try:
-                string = string.replace('\ufeff', '')   #1С бывает засовывает свою какую то параметризацию выглядик как вот эта какаха которую я отрезаю
-            finally:
-                return string
+            return string
         ##print(string)
 
 
