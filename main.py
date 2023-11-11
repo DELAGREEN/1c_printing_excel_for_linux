@@ -27,7 +27,7 @@ doc = f'''
 {textcolors.YELLOW}-excel {textcolors.BLUE}[путь к excel файлу][путь к txt файлу][разделитель1][разделитель2]
         
 {textcolors.YELLOW}-excel {textcolors.GREEN}флаг который показывает какого типа файл нужно будет собрать {textcolors.END}
-{textcolors.YELLOW}[путь к excel файлу] {textcolors.GREEN} Путь куда конкретно сохранить файл Excel с расширением {textcolors.BLUE}(.xls|.xlsx|и др)
+{textcolors.YELLOW}[путь к excel файлу] {textcolors.GREEN} Путь куда конкретно сохранить файл Excel с расширением {textcolors.BLUE}(.xlsx)
 {textcolors.YELLOW}[путь к txt файлу] {textcolors.GREEN} Путь к txt файлу сформированный 1с в котором лежат матаданные сериализатора
 {textcolors.YELLOW}[разделитель1] {textcolors.GREEN} Разделитель между данными по одной конкретной ячейки {textcolors.BLUE}[номер строки][разделитель1][номер столбца][разделитель1][значение ячейки]
 {textcolors.YELLOW}[разделитель2] {textcolors.GREEN} Разделитель между данными ячеек {textcolors.BLUE}[номер строки][разделитель1][номер столбца][разделитель1][значение ячейки][разделитель2][номер строки][разделитель1][номер столбца][разделитель1][значение ячейки]
@@ -67,6 +67,17 @@ def writer_for_excel(_strings, _path_to_excel:str, _separator_first:str, _separa
     ws = wb.worksheets[0]                                           #Номер страницы для записи
     #дробим строку вида [номер строки, номер столбца, значение ячейки][разделитель][номер строки, номер столбца, значение ячейки]
     list_strings = _strings.split(_separator_end)                    #и получаем [номер строки][разделитель][номер столбца][разделитель][значение ячейки]                     
+    
+    #print(list_strings)
+    #print(list_strings[-1][-1])
+    
+    '''Удаляем задолбавший \n в конце строки'''
+    '''Требует ОСОБОГО ВНИМАНИЯ'''
+    '''Возможны Баги в перспективе'''
+    if list_strings[-1][-1] == '\n':
+        list_strings[-1] = list_strings[-1][0:-1]
+    #print(list_strings)
+    '''Требует Особого Внимания'''
 
     for i in list_strings:
         _row, _column, _value = i.split(_separator_first)           #дробим строку на [номер строки][номер столбца][значение ячейки] 
@@ -90,7 +101,7 @@ def parse_param():
             separator_end = str(sys.argv[5])                         #Захватываем разделитель между данными одной ячейки int[4]int[4]value[5]int[4]int[4]value[5] и тд
             is_empty_excel_or_txt(path_to_excel, path_to_txt)
             writer_for_excel(read_txt(path_to_txt),path_to_excel, separator_first, separator_end)
-            print(f'{textcolors.YELLOW}Complite: {param_name}')
+            print(f'{textcolors.YELLOW}Write is Complite: {param_name}')
 
         except Exception as _ex:
             if str(_ex) == 'list index out of range':
