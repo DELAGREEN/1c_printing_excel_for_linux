@@ -66,7 +66,7 @@ def writer_for_excel(_strings, path_to_excel:str, separator_first:str, separator
 
     #дробим строку вида [номер строки, номер столбца, значение ячейки][разделитель][номер строки, номер столбца, значение ячейки]
     list_strings = _strings.split(separator_end)                    #и получаем [номер строки][разделитель][номер столбца][разделитель][значение ячейки]                     
-    
+    print(list_strings)
     #print(list_strings)
     #print(list_strings[-1][-1])
     
@@ -75,14 +75,14 @@ def writer_for_excel(_strings, path_to_excel:str, separator_first:str, separator
     '''Возможны Баги в перспективе'''
     if list_strings[-1][-1] == '\n':
         list_strings[-1] = list_strings[-1][:-1]
-    print(list_strings)
+    
     '''Требует Особого Внимания'''
     wb = load_workbook(path_to_excel)                                    #Передаем классу, методу класса Файл который нужно открыть
     
     for i in list_strings:
         
         cell_data_set = i.split(separator_first)                         #дробим строку на [номер строки][номер столбца][значение ячейки]
-        
+        #print(cell_data_set)
         if len(cell_data_set) == 3:
             _row, _column, _value = cell_data_set
             print(_row, _value, _column) 
@@ -90,7 +90,7 @@ def writer_for_excel(_strings, path_to_excel:str, separator_first:str, separator
             #ws[column] = value                                          #colunm должен равняться номеру столбца НАПРИМЕР: А1
             #print(_row, _column, _value)
             ws.cell(row=int(_row), column=int(_column)).value = _value   #передаем текст в ячейку 
-
+        
         elif len(cell_data_set) == 4:
             _row, _column, _value, _sheet_num = cell_data_set            #дробим строку на [номер строки][номер столбца][значение ячейки] 
             print(_row, _value, _column, _sheet_num)
@@ -108,7 +108,7 @@ def parse_param():
 
     param_name = sys.argv[1]
         
-    if (param_name == '--excel' or param_name == '-excel'): #Если есть тригер выполняем код ниже
+    if (param_name == '--excel' or param_name == '-excel'):          #Если есть тригер выполняем код ниже
     
         try:
             path_to_excel = str(sys.argv[2])                         #Захватываем путь к excel
@@ -120,9 +120,9 @@ def parse_param():
             print(f'{textcolors.YELLOW}Write is сomplite!')
 
         except Exception as _ex:
-
+            print(_ex)
             if str(_ex) == 'list index out of range':
-                print(f'{textcolors.RED}Ошибка.{textcolors.YELLOW} Недостаточное колличество параметров. Данный параметр принимает 4 дополнительных параметра. Обратитесь к -help')
+                print(f'{textcolors.RED}Ошибка.{textcolors.YELLOW} Индекс списка вне диапазона. Обратитесь к Администратору!')
             
             else: 
                 print(f'{textcolors.RED}Ошибка.{textcolors.YELLOW}Неизвестная ошибка: Проверьте правильность параметра:{param_name}\n{_ex}')
