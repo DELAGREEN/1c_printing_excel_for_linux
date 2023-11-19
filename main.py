@@ -55,18 +55,17 @@ def read_txt(_path_to_txt:str):
         finally:
             return string
         ##print(string)
-
+  
 
 '''
 Функция принимает строку row:column:value,row:column:value,row:column:value 
 дробит ее на параметры принимаемые openpyxl 
 НАПРИМЕР:row:column:value для поячеечной записи в excel файл
 '''
-def writer_for_excel(_strings, _path_to_excel:str, _separator_first:str, _separator_end):
-    wb = load_workbook(_path_to_excel)                              #Передаем классу, методу класса Файл который нужно открыть
-    ws = wb.worksheets[0]                                           #Номер страницы для записи
+def writer_for_excel(_strings, path_to_excel:str, separator_first:str, separator_end:str):
+
     #дробим строку вида [номер строки, номер столбца, значение ячейки][разделитель][номер строки, номер столбца, значение ячейки]
-    list_strings = _strings.split(_separator_end)                    #и получаем [номер строки][разделитель][номер столбца][разделитель][значение ячейки]                     
+    list_strings = _strings.split(separator_end)                    #и получаем [номер строки][разделитель][номер столбца][разделитель][значение ячейки]                     
     
     #print(list_strings)
     #print(list_strings[-1][-1])
@@ -75,17 +74,34 @@ def writer_for_excel(_strings, _path_to_excel:str, _separator_first:str, _separa
     '''Требует ОСОБОГО ВНИМАНИЯ'''
     '''Возможны Баги в перспективе'''
     if list_strings[-1][-1] == '\n':
-        list_strings[-1] = list_strings[-1][0:-1]
-    #print(list_strings)
+        list_strings[-1] = list_strings[-1][:-1]
+    print(list_strings)
     '''Требует Особого Внимания'''
-
+    wb = load_workbook(path_to_excel)                                    #Передаем классу, методу класса Файл который нужно открыть
+    
     for i in list_strings:
-        _row, _column, _value = i.split(_separator_first)           #дробим строку на [номер строки][номер столбца][значение ячейки] 
-        #ws[column] = value                                         #colunm должен равняться номеру столбца НАПРИМЕР: А1
-        #print(_row, _column, _value)
-        ws.cell(row=int(_row), column=int(_column)).value = _value   #передаем текст в ячейку                
+        
+        cell_data_set = i.split(separator_first)                         #дробим строку на [номер строки][номер столбца][значение ячейки]
+        
+        if len(cell_data_set) == 3:
+            _row, _column, _value = cell_data_set
+            print(_row, _value, _column) 
+            ws = wb.worksheets[0]                                        #Номер страницы для записи
+            #ws[column] = value                                          #colunm должен равняться номеру столбца НАПРИМЕР: А1
+            #print(_row, _column, _value)
+            ws.cell(row=int(_row), column=int(_column)).value = _value   #передаем текст в ячейку 
 
-    wb.save(_path_to_excel)                                          #сохраняем файл
+        elif len(cell_data_set) == 4:
+            _row, _column, _value, _sheet_num = cell_data_set            #дробим строку на [номер строки][номер столбца][значение ячейки] 
+            print(_row, _value, _column, _sheet_num)
+            print(type(int(_sheet_num)))
+            ws = wb.worksheets[int(_sheet_num)]                          #Номер страницы для записи
+            ws.cell(row=int(_row), column=int(_column)).value = _value   #передаем текст в ячейку
+
+        else:
+            print('Не правильно сереализорован TXT файл, или Excel имеет одну страницу')
+
+    wb.save(path_to_excel)                                               #сохраняем файл
 
 
 def parse_param():
@@ -100,12 +116,14 @@ def parse_param():
             separator_first = str(sys.argv[4])                       #Захватываем разделитель между значениями ячек и данными int[4]int[4]value
             separator_end = str(sys.argv[5])                         #Захватываем разделитель между данными одной ячейки int[4]int[4]value[5]int[4]int[4]value[5] и тд
             is_empty_excel_or_txt(path_to_excel, path_to_txt)
-            writer_for_excel(read_txt(path_to_txt),path_to_excel, separator_first, separator_end)
-            print(f'{textcolors.YELLOW}Write is Complite: {param_name}')
+            writer_for_excel(read_txt(path_to_txt), path_to_excel, separator_first, separator_end)
+            print(f'{textcolors.YELLOW}Write is сomplite!')
 
         except Exception as _ex:
+
             if str(_ex) == 'list index out of range':
                 print(f'{textcolors.RED}Ошибка.{textcolors.YELLOW} Недостаточное колличество параметров. Данный параметр принимает 4 дополнительных параметра. Обратитесь к -help')
+            
             else: 
                 print(f'{textcolors.RED}Ошибка.{textcolors.YELLOW}Неизвестная ошибка: Проверьте правильность параметра:{param_name}\n{_ex}')
             time.sleep(5)
