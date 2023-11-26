@@ -5,6 +5,7 @@ from openpyxl.workbook import Workbook
 from openpyxl.reader.excel import load_workbook
 import time
 import os
+from errors_logger import ErrorsLogger as Logger
 
 
 class textcolors:
@@ -35,6 +36,7 @@ doc = f'''
 '''
 
 def is_empty_excel_or_txt(_path_to_excel:str, _path_to_txt:str):
+
     '''Проверяем создан файл если нет создаем'''
     if not os.path.exists(_path_to_excel):
         wb = Workbook()                      
@@ -42,19 +44,19 @@ def is_empty_excel_or_txt(_path_to_excel:str, _path_to_txt:str):
 
     '''Проверяем создан файл если нет создаем'''
     if not os.path.exists(_path_to_txt):
-        print(f'{textcolors.YELLOW}Ошибка. Файл с расширением .txt отсутствует')
+        Logger.print_error('Файл с расширением .txt не обнаружен')
+        print(f'{textcolors.YELLOW}Ошибка. Файл с расширением .txt не обнаружен')
 
 
 def read_txt(_path_to_txt:str):
+    
     with open(_path_to_txt, 'r') as txt_file:
         string = txt_file.read()
-        
         #Вычищаем возможную помойку
         try:
             string = string.replace('\ufeff', '')   #1С бывает засовывает свою какую то параметризацию выглядик как вот эта какаха которую я отрезаю
         finally:
             return string
-        ##print(string)
   
 
 '''
@@ -65,10 +67,7 @@ def read_txt(_path_to_txt:str):
 def writer_for_excel(_strings, path_to_excel:str, separator_first:str, separator_end:str):
 
     #дробим строку вида [номер строки, номер столбца, значение ячейки][разделитель][номер строки, номер столбца, значение ячейки]
-    list_strings = _strings.split(separator_end)                    #и получаем [номер строки][разделитель][номер столбца][разделитель][значение ячейки]                     
-    print(list_strings)
-    #print(list_strings)
-    #print(list_strings[-1][-1])
+    list_strings = _strings.split(separator_end)                        #и получаем [номер строки][разделитель][номер столбца][разделитель][значение ячейки]                     
     
     '''Удаляем задолбавший \n в конце строки'''
     '''Требует ОСОБОГО ВНИМАНИЯ'''
@@ -85,7 +84,7 @@ def writer_for_excel(_strings, path_to_excel:str, separator_first:str, separator
         #print(cell_data_set)
         if len(cell_data_set) == 3:
             _row, _column, _value = cell_data_set
-            print(_row, _value, _column) 
+            #print(_row, _value, _column) 
             ws = wb.worksheets[0]                                        #Номер страницы для записи
             #ws[column] = value                                          #colunm должен равняться номеру столбца НАПРИМЕР: А1
             #print(_row, _column, _value)
@@ -93,18 +92,25 @@ def writer_for_excel(_strings, path_to_excel:str, separator_first:str, separator
         
         elif len(cell_data_set) == 4:
             _row, _column, _value, _sheet_num = cell_data_set            #дробим строку на [номер строки][номер столбца][значение ячейки] 
-            print(_row, _value, _column, _sheet_num)
-            print(type(int(_sheet_num)))
+            #print(_row, _value, _column, _sheet_num)
+            #print(type(int(_sheet_num)))
             ws = wb.worksheets[int(_sheet_num)]                          #Номер страницы для записи
             ws.cell(row=int(_row), column=int(_column)).value = _value   #передаем текст в ячейку
 
         else:
-            print('Не правильно сереализорован TXT файл, или Excel имеет одну страницу')
+            Logger.print_error('Не правильно сереализирован TXT файл.')
+            print('Не правильно сереализирован TXT файл.')
 
     wb.save(path_to_excel)                                               #сохраняем файл
 
 
 def parse_param():
+    
+    param_name = 'None'
+    path_to_excel = 'None'
+    path_to_txt = 'None'
+    separator_first = 'None'
+    separator_end = 'None'
 
     param_name = sys.argv[1]
         
@@ -117,14 +123,28 @@ def parse_param():
             separator_end = str(sys.argv[5])                         #Захватываем разделитель между данными одной ячейки int[4]int[4]value[5]int[4]int[4]value[5] и тд
             is_empty_excel_or_txt(path_to_excel, path_to_txt)
             writer_for_excel(read_txt(path_to_txt), path_to_excel, separator_first, separator_end)
+            Logger.print_info('Write is сomplite!')
             print(f'{textcolors.YELLOW}Write is сomplite!')
 
         except Exception as _ex:
-            print(_ex)
             if str(_ex) == 'list index out of range':
+                Logger.print_error(f'Индекс списка вне диапазона. Колличество страниц в excel не совпадает с колличеством которое пытаюся записать!\n'
+                                   f'param_name = {param_name}\n'
+                                   f'path_to_excel = {path_to_excel}\n'
+                                   f'path_to_txt = {path_to_txt}\n'
+                                   f'separator_first = {separator_first}\n'
+                                   f'separator_end = {separator_end}\n'
+                                   f'EXCEPTION: {_ex}')
                 print(f'{textcolors.RED}Ошибка.{textcolors.YELLOW} Индекс списка вне диапазона. Обратитесь к Администратору!')
             
-            else: 
+            else:
+                Logger.print_error(f'Неизвестная ошибка: Проверьте правильность параметра:'
+                                   f'param_name = {param_name}\n'
+                                   f'path_to_excel = {path_to_excel}\n'
+                                   f'path_to_txt = {path_to_txt}\n'
+                                   f'separator_first = {separator_first}\n'
+                                   f'separator_end = {separator_end}\n'
+                                   f'EXCEPTION: {_ex}') 
                 print(f'{textcolors.RED}Ошибка.{textcolors.YELLOW}Неизвестная ошибка: Проверьте правильность параметра:{param_name}\n{_ex}')
             time.sleep(5)
             sys.exit(1)
@@ -134,15 +154,18 @@ def parse_param():
         sys.exit(1)
    
     else:
-
-        print(f'{textcolors.RED}Ошибка. {textcolors.YELLOW}Неизвестный параметр {param_name}')
+        Logger.print_error(f'Неизвестный параметр: {param_name}')
+        print(f'{textcolors.RED}Ошибка. {textcolors.YELLOW}Неизвестный параметр: {param_name}')
         sys.exit(1)
 
 
 if __name__ == '__main__':
 
+    Logger.print_info('Start programm...')
+
     if len(sys.argv) == 1:
 
+        Logger.print_warning('Дополнительные параметры не заданы.')
         print(f'{textcolors.RED}Внимание! {textcolors.YELLOW}Дополнительные параметры не заданы.\n' 
                'Модуль не работает без дополнительных параметров.\n'
                f'В качестве параметров принимается {textcolors.GREEN}Строка(String){textcolors.YELLOW} в качестве разделителей параметров {textcolors.GREEN}Пробел(Space).{textcolors.YELLOW} Пример: {textcolors.BLUE}[Параметр1] [Параметр2] [Параметр3]{textcolors.YELLOW} и тд (без квадратных скобок).\n'
@@ -161,8 +184,10 @@ if __name__ == '__main__':
         
     else:
         if len(sys.argv) <= 5:
-            print(f'{textcolors.RED}Ошибка. {textcolors.YELLOW}Слишком мало параметров. Обратитесь к -help')
+            Logger.print_error('Слишком мало параметров. Длина массива параметров меньше 6.')
+            print(f'{textcolors.RED}Ошибка. {textcolors.YELLOW}Слишком мало параметров. Воспользуйтесь командой -help.')
             sys.exit(1)
 
 #time.sleep(5)
+Logger.print_info('End programm...')
 sys.exit(1)
