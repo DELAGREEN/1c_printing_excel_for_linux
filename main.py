@@ -82,20 +82,16 @@ def writer_for_excel(_strings, path_to_excel:str, separator_first:str, separator
     for i in list_strings:
         
         cell_data_set = i.split(separator_first)                             #дробим строку на [номер строки][номер столбца][значение ячейки]
-        #print(cell_data_set)
+
         match cell_data_set:
-            case _row, _column, _value:
-                #_row, _column, _value = cell_data_set
-                #print(_row, _value, _column) 
+            case _row, _column, _value:                                      #дробим строку на [номер строки][номер столбца][значение ячейки] 
+                #_row, _column, _value = cell_data_set                       #Эта строка аналогична верхней, более читабельна, оставил что бы не забыть как это выглядит по нормальному
                 ws = wb.worksheets[0]                                        #Номер страницы для записи
                 #ws[column] = value                                          #colunm должен равняться номеру столбца НАПРИМЕР: А1
-                #print(_row, _column, _value)
                 ws.cell(row=int(_row), column=int(_column)).value = _value   #передаем текст в ячейку 
         
-            case _row, _column, _value, _sheet_num:
-                #_row, _column, _value, _sheet_num = cell_data_set            #дробим строку на [номер строки][номер столбца][значение ячейки] 
-                #print(_row, _value, _column, _sheet_num)
-                #print(type(int(_sheet_num)))
+            case _row, _column, _value, _sheet_num:                          #дробим строку на [номер строки][номер столбца][значение ячейки][номер страницы]
+                #_row, _column, _value, _sheet_num = cell_data_set             
                 ws = wb.worksheets[int(_sheet_num)]                          #Номер страницы для записи
                 ws.cell(row=int(_row), column=int(_column)).value = _value   #передаем текст в ячейку
 
@@ -104,6 +100,8 @@ def writer_for_excel(_strings, path_to_excel:str, separator_first:str, separator
                 print('Не правильно сереализирован TXT файл.')
 
     wb.save(path_to_excel)                                                   #сохраняем файл
+    Logger.print_info('Write is сomplite!')
+    print(f'{textcolors.YELLOW}Write is сomplite!')
 
 def parse_param():
     
@@ -123,8 +121,6 @@ def parse_param():
                 separator_end = str(sys.argv[5])                             #Захватываем разделитель между данными одной ячейки int[4]int[4]value[5]int[4]int[4]value[5] и тд
                 is_empty_excel_or_txt(path_to_excel, path_to_txt)
                 writer_for_excel(read_txt(path_to_txt), path_to_excel, separator_first, separator_end)
-                Logger.print_info('Write is сomplite!')
-                print(f'{textcolors.YELLOW}Write is сomplite!')
 
             except Exception as _ex:
                 if str(_ex) == 'list index out of range':
@@ -146,18 +142,14 @@ def parse_param():
                                     f'separator_end = {separator_end}\n'
                                     f'EXCEPTION: {_ex}') 
                     print(f'{textcolors.RED}Ошибка.{textcolors.YELLOW} Неизвестная ошибка: Проверьте правильность параметра:{param_name}\n{_ex}')
-            time.sleep(5)
-            sys.exit(1)
         
         case '--help'|'-help':
-            print(f'{textcolors.CYAN}***HELP SHEET***\n{doc}')
-            sys.exit(1)
+            print(f'{textcolors.CYAN}***HELP SHEET***\n{doc}')  
    
         case _:
             Logger.print_error(f'Неизвестный параметр: {param_name}')
             print(f'{textcolors.RED}Ошибка. {textcolors.YELLOW}Неизвестный параметр: {param_name}')
-            sys.exit(1)
-
+            
 
 if __name__ == '__main__':
 
@@ -166,7 +158,6 @@ if __name__ == '__main__':
     match len(sys.argv):
 
         case 1:
-            Logger.print_warning('Дополнительные параметры не заданы.')
             print(f'{textcolors.RED}Внимание! {textcolors.YELLOW}Дополнительные параметры не заданы.\n' 
                 'Модуль не работает без дополнительных параметров.\n'
                 f'В качестве параметров принимается {textcolors.GREEN}Строка(String){textcolors.YELLOW} в качестве разделителей параметров {textcolors.GREEN}Пробел(Space).{textcolors.YELLOW} Пример: {textcolors.BLUE}[Параметр1] [Параметр2] [Параметр3]{textcolors.YELLOW} и тд (без квадратных скобок).\n'
@@ -176,6 +167,7 @@ if __name__ == '__main__':
                 f'{textcolors.YELLOW}*ИЛИ*\n'
                 'Ознакомтесь с документацией c помошью команды -help.'
                 f'{textcolors.END}')
+            Logger.print_warning('Дополнительные параметры не заданы.')
     
         case 2:
             parse_param()   #Парсим параметры
@@ -184,9 +176,8 @@ if __name__ == '__main__':
             parse_param()   #Парсим параметры 
         
         case _:
-            Logger.print_error('Слишком мало параметров. Длина массива параметров меньше 6.')
             print(f'{textcolors.RED}Ошибка. {textcolors.YELLOW}Слишком мало параметров. Воспользуйтесь командой -help.')
-            sys.exit(1)
+            Logger.print_error('Длина массива параметров не соответствует требуемым.')
 
 Logger.print_info('End programm...')
 sys.exit(1)
