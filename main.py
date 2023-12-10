@@ -6,7 +6,7 @@ from openpyxl.reader.excel import load_workbook
 import time
 import os
 from errors_logger import ErrorsLogger as Logger
-from icecream import ic
+#from icecream import ic
 
 
 class textcolors:

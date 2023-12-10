@@ -1,6 +1,7 @@
 ####Folder####
 tests/
 __pycache__/
+venv/
 
 ##############
 
