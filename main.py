@@ -113,37 +113,37 @@ def parse_param():
     separator_end = 'None'
 
     param_name = sys.argv[1]
-    if param_name == '--excel'| '-excel':                                    #Если есть тригер выполняем код ниже                                                    
-            try:
-                path_to_excel = str(sys.argv[2])                             #Захватываем путь к excel
-                path_to_txt = str(sys.argv[3])                               #Захватываем путь к txt
-                separator_first = str(sys.argv[4])                           #Захватываем разделитель между значениями ячек и данными int[4]int[4]value
-                separator_end = str(sys.argv[5])                             #Захватываем разделитель между данными одной ячейки int[4]int[4]value[5]int[4]int[4]value[5] и тд
-                is_empty_excel_or_txt(path_to_excel, path_to_txt)
-                writer_for_excel(read_txt(path_to_txt), path_to_excel, separator_first, separator_end)
+    if param_name == '--excel' or '-excel':                                    #Если есть тригер выполняем код ниже                                                    
+        try:
+            path_to_excel = str(sys.argv[2])                             #Захватываем путь к excel
+            path_to_txt = str(sys.argv[3])                               #Захватываем путь к txt
+            separator_first = str(sys.argv[4])                           #Захватываем разделитель между значениями ячек и данными int[4]int[4]value
+            separator_end = str(sys.argv[5])                             #Захватываем разделитель между данными одной ячейки int[4]int[4]value[5]int[4]int[4]value[5] и тд
+            is_empty_excel_or_txt(path_to_excel, path_to_txt)
+            writer_for_excel(read_txt(path_to_txt), path_to_excel, separator_first, separator_end)
 
-            except Exception as _ex:
-                if str(_ex) == 'list index out of range':
-                    Logger.print_error(f'Индекс списка вне диапазона. Колличество страниц в excel не совпадает с колличеством которое пытаюся записать!\n'
+        except Exception as _ex:
+            if str(_ex) == 'list index out of range':
+                Logger.print_error(f'Индекс списка вне диапазона. Колличество страниц в excel не совпадает с колличеством которое пытаюся записать!\n'
                                     f'param_name = {param_name}\n'
                                     f'path_to_excel = {path_to_excel}\n'
                                     f'path_to_txt = {path_to_txt}\n'
                                     f'separator_first = {separator_first}\n'
                                     f'separator_end = {separator_end}\n'
                                     f'EXCEPTION: {_ex}')
-                    print(f'{textcolors.RED}Ошибка.{textcolors.YELLOW} Индекс списка вне диапазона. Обратитесь к Администратору!')
+                print(f'{textcolors.RED}Ошибка.{textcolors.YELLOW} Индекс списка вне диапазона. Обратитесь к Администратору!')
             
-                else:
-                    Logger.print_error(f'Неизвестная ошибка: Проверьте правильность параметра:'
+            else:
+                Logger.print_error(f'Неизвестная ошибка: Проверьте правильность параметра:'
                                     f'param_name = {param_name}\n'
                                     f'path_to_excel = {path_to_excel}\n'
                                     f'path_to_txt = {path_to_txt}\n'
                                     f'separator_first = {separator_first}\n'
                                     f'separator_end = {separator_end}\n'
                                     f'EXCEPTION: {_ex}') 
-                    print(f'{textcolors.RED}Ошибка.{textcolors.YELLOW} Неизвестная ошибка: Проверьте правильность параметра:{param_name}\n{_ex}')
+                print(f'{textcolors.RED}Ошибка.{textcolors.YELLOW} Неизвестная ошибка: Проверьте правильность параметра:{param_name}\n{_ex}')
         
-    elif param_name == '--help'|'-help':
+    elif param_name == '--help' or '-help':
         print(f'{textcolors.CYAN}***HELP SHEET***\n{doc}')  
    
     else:
