@@ -3,7 +3,6 @@
 import sys
 from openpyxl.workbook import Workbook
 from openpyxl.reader.excel import load_workbook
-import time
 import os
 from errors_logger import ErrorsLogger as Logger
 #from icecream import ic
@@ -103,13 +102,7 @@ def writer_for_excel(_strings, path_to_excel:str, separator_first:str, separator
     Logger.print_info('Write is сomplite!')
     print(f'{textcolors.YELLOW}Write is сomplite!')
 
-def parse_param():
-    
-    param_name = 'None'
-    path_to_excel = 'None'
-    path_to_txt = 'None'
-    separator_first = 'None'
-    separator_end = 'None'
+def parse_param(param_name = 'None', path_to_excel = 'None', path_to_txt = 'None', separator_first = 'None', separator_end = 'None'):
 
     param_name = sys.argv[1]
     match param_name:
@@ -179,5 +172,11 @@ if __name__ == '__main__':
             print(f'{textcolors.RED}Ошибка. {textcolors.YELLOW}Слишком мало параметров. Воспользуйтесь командой -help.')
             Logger.print_error('Длина массива параметров не соответствует требуемым.')
 
-Logger.print_info('End programm...')
-sys.exit(1)
+    try:
+        os.remove(sys.argv[3])  
+    except Exception as _ex:
+        Logger.print_error(f'Ошибка удаления файла. EXCEPTION: {_ex}')
+
+    Logger.print_info('End programm...')
+
+    sys.exit(1)
