@@ -11,7 +11,7 @@ class ErrorsLogger():
     def _log_config(func) -> object:
         def printer(*args, **kwgs) -> object:
             logging.basicConfig(level=logging.INFO,
-                            filename="excel_printer.log",
+                            filename="/tmp/excel_printer.log",
                             filemode="a+",
                             format="%(asctime)s %(levelname)s %(message)s",
                             datefmt="%d-%m-%Y %H:%M:%S")
